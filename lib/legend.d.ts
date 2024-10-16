@@ -1,9 +1,13 @@
 /// <reference types="jest" />
-import { Selector } from '@legendapp/state';
+import { Observable, Selector } from '@legendapp/state';
 /**
  * syncedCrud 의 as 가 object 인 경우 key 로 찾기
  */
-export declare const findByKey: <T>(obj: object, key: string, value: string) => T | undefined;
+export declare const findByKey: <T>(obj: object, match: {
+    [key: string]: string;
+}) => T | undefined;
+export declare const uniqueSetAdd: <T>(selector: Observable<Set<T>>, key: keyof T, value: T) => void;
+export declare const uniqueMapAdd: <T>(selector: Observable<Map<string, T>>, key: keyof T, value: T) => void;
 /**
  * data array list를 syncedCrud에 맞게 변환
  * as='object' 인 경우 사용
@@ -15,7 +19,7 @@ export declare const arrayMerge: (a: any[] | undefined, b: any[] | undefined, p:
  * sync state
  * https://legendapp.com/open-source/state/v3/sync/persist-sync/#syncstate
  */
-export declare const useSyncState: <T>(selector: Selector<T>, action: boolean, callback: {
+export declare const useSyncState: <T>(selector: Selector<T>, check: () => boolean, callback: {
     success: () => void;
     fail: () => void;
 }) => void;

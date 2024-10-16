@@ -28,23 +28,8 @@ export function isCustomError(err: unknown): err is CustomError {
 }
 //---------------------------------------------------------------------------------------------
 export function isPrismaError(err: unknown): err is PrismaClientKnownRequestError {
-  return Boolean(
-    err &&
-      (err instanceof PrismaClientKnownRequestError ||
-        (err as PrismaClientKnownRequestError).name === 'PrismaClientKnownRequestError'),
-  )
+  return Boolean(err && (err as PrismaClientKnownRequestError).name === 'PrismaClientKnownRequestError')
 }
-// export function isPrismaError(
-//   err: unknown,
-// ): err is Prisma.PrismaClientKnownRequestError | Prisma.PrismaClientValidationError {
-//   return Boolean(
-//     err &&
-//       (err instanceof Prisma.PrismaClientKnownRequestError ||
-//         err instanceof Prisma.PrismaClientValidationError ||
-//         (err as Prisma.PrismaClientKnownRequestError).name === 'PrismaClientKnownRequestError' ||
-//         (err as Prisma.PrismaClientValidationError).name === 'PrismaClientValidationError'),
-//   )
-// }
 //---------------------------------------------------------------------------------------------
 // Pretty Error Object
 //---------------------------------------------------------------------------------------------
@@ -55,7 +40,15 @@ export function getPrettyError(err: unknown): {code?: number; message: string} {
     return {code: (err as BaseError).code, message: (err as BaseError).message}
   } else if (isPrismaError(err)) {
     const e = new prismaError(err)
-    return {code: e.statusCode, message: err.message + ':' + JSON.stringify(e.metaData)}
+    let metaData = ''
+    if (typeof e.metaData === 'object') {
+      for (const key in e.metaData as unknown as object) {
+        metaData += `${key}: ${e.metaData[key]}, `
+      }
+    } else {
+      metaData = e.metaData as string
+    }
+    return {code: e.statusCode, message: e.message + ': ' + metaData}
   } else {
     if (process.env.NODE_ENV === 'development') {
       console.error(err)

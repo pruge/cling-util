@@ -1,17 +1,46 @@
-import {Selector} from '@legendapp/state'
+import {Observable, ObservablePrimitive, Selector} from '@legendapp/state'
 import {useObserveEffect} from '@legendapp/state/react'
 
 /**
  * syncedCrud 의 as 가 object 인 경우 key 로 찾기
  */
-export const findByKey = <T>(obj: object, key: string, value: string) => {
+export const findByKey = <T>(obj: object, match: {[key: string]: string}) => {
+  if (!obj) return undefined
   for (const [k, v] of Object.entries(obj)) {
-    // console.log('k, v', k, v)
-    if (v[key] === value) {
+    let flg = true
+    for (const [k2, v2] of Object.entries(match)) {
+      if (v[k2] !== v2) {
+        flg = false
+        break
+      }
+    }
+    if (flg) {
       return v as T
     }
   }
   return undefined
+}
+
+export const uniqueSetAdd = <T>(selector: Observable<Set<T>>, key: keyof T, value: T) => {
+  const iter = selector.values()
+  let isExist = false
+  for (const item of iter) {
+    isExist = item[key] === value[key] || isExist
+    if (isExist) {
+      selector.delete(item)
+      selector.add({...item, ...value})
+      break
+    }
+  }
+  if (!isExist) {
+    selector.add(value)
+  }
+}
+
+export const uniqueMapAdd = <T>(selector: Observable<Map<string, T>>, key: keyof T, value: T) => {
+  const _key = value[key] as unknown as string
+  const item = selector.get(_key).get() ?? {}
+  selector.set(_key, {...item, ...value})
 }
 
 /**
@@ -57,16 +86,21 @@ export const arrayMerge = (a: any[] = [], b: any[] = [], p: string) => {
  * sync state
  * https://legendapp.com/open-source/state/v3/sync/persist-sync/#syncstate
  */
+
 export const useSyncState = <T>(
   selector: Selector<T>,
-  action: boolean,
+  check: () => boolean,
   callback: {success: () => void; fail: () => void},
 ) => {
   useObserveEffect(selector, (state) => {
-    if (!action) return
+    // console.log('selector', !action, !state.previous, !state.value, !state.value?.isLoaded, state)
+
+    if (!check()) return
+    if (!state.previous) return
     if (!state.value) return
     const {error, isLoaded} = state.value as {error?: unknown; isLoaded?: boolean}
     if (!isLoaded) return
+
     if (!error) {
       callback.success()
     } else {
