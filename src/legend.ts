@@ -81,30 +81,3 @@ export const arrayMerge = (a: any[] = [], b: any[] = [], p: string) => {
 
   return mergedArray
 }
-
-/**
- * sync state
- * https://legendapp.com/open-source/state/v3/sync/persist-sync/#syncstate
- */
-
-export const useSyncState = <T>(
-  selector: Selector<T>,
-  check: () => boolean,
-  callback: {success: () => void; fail: () => void},
-) => {
-  useObserveEffect(selector, (state) => {
-    // console.log('selector', !action, !state.previous, !state.value, !state.value?.isLoaded, state)
-
-    if (!check()) return
-    if (!state.previous) return
-    if (!state.value) return
-    const {error, isLoaded} = state.value as {error?: unknown; isLoaded?: boolean}
-    if (!isLoaded) return
-
-    if (!error) {
-      callback.success()
-    } else {
-      callback.fail()
-    }
-  })
-}

@@ -82,3 +82,22 @@ export const generateUrl = (path: string, query: Record<string, string> = {}) =>
   }
   return '/' + url.toString().split('/').slice(3).join('/')
 }
+
+/**
+ * isEmpty
+ */
+export const isEmpty = (value: unknown) => {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'string') return value.trim() === ''
+  if (Array.isArray(value)) return value.length === 0
+  if (typeof value === 'object') return Object.keys(value).length === 0
+  return false
+}
+
+/**
+ * getValue with default
+ */
+export const getValue = <T = unknown>(value: T, defaultValue: T) => {
+  if (isEmpty(value)) return defaultValue
+  return value
+}

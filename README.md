@@ -29,6 +29,24 @@ const label = toCapitalize('home')
 // Home
 ```
 
+#### isEmpty
+```ts
+import { isEmpty } from '@cling/utils';
+
+const label = ''
+if (isEmpty(label)) {
+  console.log('empty')
+}
+```
+
+#### getValue
+```ts
+import { getValue } from '@cling/utils';
+
+const label = ''
+const labelWithDefault = getValue(label, 'default')
+```
+
 ## :: legnedstate
 
 #### findByKey
@@ -61,46 +79,6 @@ const id = '1'
 const item = items$[id].get()
 ```
 
-#### useSyncState
-```ts
-import {useSyncState} from '@cling/utils'
-import {observable, syncState} from '@legendapp/state'
-
-type Item = {
-  id: string
-  name: string
-  tag: string
-}
-
-const items$ = observable(syncedCrud({
-  list: ... ,
-  create: ... ,
-
-  as: 'object'
-}))
-const itemState$ = syncState(items$)
-
-items$.push({
-  id: '1',
-  name: 'home',
-  tag: 'button',
-})
-
-items$['1'].set((prev)=> ({...prev, name: 'school'}))
-
-const isCreated = // check create/update/delete...
-useSyncState(itemState$, isCreated, {
-  success: () => {},
-  fail: () => {},
-})
-
-const isUpdated = // check create/update/delete...
-useSyncState(itemState$, isUpdated, {
-  success: () => {},
-  fail: () => {},
-})
-
-```
 ## :: error
 
 #### AuthorizationError < BaseError < CustomError

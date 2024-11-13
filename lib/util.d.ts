@@ -13,3 +13,11 @@ export declare const pick: <T>(obj: T, ...props: (keyof T)[]) => Partial<T>;
 export declare const omit: <T>(obj: T, ...props: (keyof T)[]) => T;
 export declare const isEqualObject: (a: Record<string, unknown>, b: Record<string, unknown>) => boolean;
 export declare const generateUrl: (path: string, query?: Record<string, string>) => string;
+/**
+ * isEmpty
+ */
+export declare const isEmpty: (value: unknown) => boolean;
+/**
+ * getValue with default
+ */
+export declare const getValue: <T = unknown>(value: T, defaultValue: T) => T;
